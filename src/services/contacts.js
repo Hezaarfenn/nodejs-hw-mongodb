@@ -12,11 +12,9 @@ const getAllContacts = async ({
   isFavourite,
 }) => {
   const filterOptions = {};
-
   if (type) {
     filterOptions.contactType = type;
   }
-
   if (isFavourite) {
     filterOptions.isFavourite = isFavourite === "true";
   }
