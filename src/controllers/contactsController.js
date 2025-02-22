@@ -2,14 +2,46 @@ import createErrors from "http-errors";
 import contactsService from "../services/contacts.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
+import parseSortParams from "../utils/parseSortParams.js";
+import parsePaginationParams from "../utils/parsePaginationParams.js";
 
 const getAllContacts = async (req, res) => {
   try {
-    const contacts = await contactsService.getAllContacts();
+    const { page, perPage } = parsePaginationParams(req.query);
+    const { sortBy, sortOrder } = parseSortParams(req.query);
+    const { type, isFavourite } = req.query;
+
+    const filterOptions = {};
+    if (type) {
+      filterOptions.contactType = type;
+      if (isFavourite) {
+        filterOptions.isFavourite = isFavourite === "true";
+      }
+    }
+
+    const contacts = await contactsService.getAllContacts({
+      filterOptions,
+      page,
+      perPage,
+      sortBy,
+      sortOrder,
+    });
+
+    const totalItems = await contactsService.getAllContacts(filterOptions);
+    const totalPages = Math.ceil(totalItems / perPage);
+
     res.status(200).json({
       status: 200,
       message: "Successfully found contacts!",
-      data: contacts,
+      data: {
+        data: contacts,
+        page: Number(page),
+        perPage: Number(perPage),
+        totalItems,
+        totalPages,
+        hasPreviousPage: page !== 1,
+        hasNextPage: page < totalPages,
+      },
     });
   } catch (error) {
     res.status(500).json({
