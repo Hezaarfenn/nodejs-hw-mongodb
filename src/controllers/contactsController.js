@@ -1,5 +1,5 @@
 import createErrors from "http-errors";
-import contactsService from "../services/contacts.js";
+import contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
 import parseSortParams from "../utils/parseSortParams.js";
@@ -20,28 +20,17 @@ const getAllContacts = async (req, res) => {
     }
 
     const contacts = await contactsService.getAllContacts({
-      filterOptions,
       page,
       perPage,
       sortBy,
       sortOrder,
+      ...filterOptions,
     });
-
-    const totalItems = await contactsService.getAllContacts(filterOptions);
-    const totalPages = Math.ceil(totalItems / perPage);
 
     res.status(200).json({
       status: 200,
       message: "Successfully found contacts!",
-      data: {
-        data: contacts,
-        page: Number(page),
-        perPage: Number(perPage),
-        totalItems,
-        totalPages,
-        hasPreviousPage: page !== 1,
-        hasNextPage: page < totalPages,
-      },
+      data: contacts,
     });
   } catch (error) {
     res.status(500).json({
