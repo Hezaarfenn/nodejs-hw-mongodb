@@ -1,8 +1,44 @@
 import Contact from "../db/models/Contact.js";
 import createErrors from "http-errors";
+import SORT_ORDER from "../constants/index.js";
+import calculatePaginationData from "../utils/calculatePaginationData.js";
 
-const getAllContacts = async () => {
-  return await Contact.find();
+const getAllContacts = async ({
+  page = 1,
+  perPage = 10,
+  sortOrder = SORT_ORDER.ASC,
+  sortBy = "name",
+  type,
+  isFavourite,
+}) => {
+  const filterOptions = {};
+
+  if (type) {
+    filterOptions.contactType = type;
+  }
+
+  if (isFavourite) {
+    filterOptions.isFavourite = isFavourite === "true";
+  }
+
+  const limit = perPage;
+  const skip = (page - 1) * perPage;
+
+  const contactsQuery = Contact.find(filterOptions);
+  const contactsCount = await Contact.countDocuments(filterOptions);
+
+  const contacts = await contactsQuery
+    .skip(skip)
+    .limit(limit)
+    .sort({ [sortBy]: sortOrder })
+    .exec();
+
+  const paginationData = calculatePaginationData(contactsCount, page, perPage);
+
+  return {
+    data: contacts,
+    ...paginationData,
+  };
 };
 
 const getContactById = async (contactId) => {
