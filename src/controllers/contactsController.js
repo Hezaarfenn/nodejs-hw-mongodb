@@ -1,5 +1,5 @@
 import createErrors from "http-errors";
-import contactsService from "../services/contacts.js";
+import contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
 import parseSortParams from "../utils/parseSortParams.js";
