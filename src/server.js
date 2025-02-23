@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import pino from "pino";
+import pinoHttp from "pino-http";
 import contactsRouter from "./routers/contactsRouter.js";
+import authRouter from "./routers/authRouter.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFoundHandler from "./middlewares/notFoundHandler.js";
 
@@ -12,16 +14,15 @@ const setupServer = () => {
   app.use(express.json());
 
   const logger = pino();
-  app.use((req, res, next) => {
-    logger.info(`${req.method} ${req.url}`);
-    next();
-  });
+  app.use(pinoHttp({ logger }));
 
   app.get("/", (req, res) => {
     res.json({ message: "Welcome to the Contacts API" });
   });
 
   app.use("/contacts", contactsRouter);
+  app.use("/auth", authRouter);
+
   app.use(notFoundHandler);
   app.use(errorHandler);
 
