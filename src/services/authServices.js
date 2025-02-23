@@ -1,7 +1,9 @@
+import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import createHttpError from "http-errors";
 import UserCollection from "../db/models/userModel.js";
+import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/indexConstants.js";
+import { SessionsCollection } from "../db/models/sessionModel.js";
 
 export const registerUserServices = async ({ name, email, password }) => {
   const user = await UserCollection.findOne({ email: email.toLowerCase() });
@@ -19,17 +21,25 @@ export const loginUserServices = async ({ email, password }) => {
   const user = await UserCollection.findOne({
     email: email.toLowerCase(),
   });
-  if (!user) throw createHttpError(401, "Invalid email!");
+  if (!user) {
+    throw createHttpError(404, "User not found");
+  }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) throw createHttpError(401, "Invalid password!");
+  if (!isPasswordValid) {
+    throw createHttpError(401, "Unauthorized");
+  }
 
-  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
-  });
-  const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "30d",
-  });
+  await SessionsCollection.deleteOne({ userId: user._id });
 
-  return { user, accessToken, refreshToken };
+  const accessToken = randomBytes(30).toString("base64");
+  const refreshToken = randomBytes(30).toString("base64");
+
+  return await SessionsCollection.create({
+    userId: user._id,
+    accessToken,
+    refreshToken,
+    accessTokenValidUntil: new Date(Date.now() + FIFTEEN_MINUTES),
+    refreshTokenValidUntil: new Date(Date.now() + ONE_DAY),
+  });
 };

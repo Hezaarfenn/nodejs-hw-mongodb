@@ -1,3 +1,4 @@
+import { ONE_DAY } from "../constants/indexConstants.js";
 import {
   registerUserServices,
   loginUserServices,
@@ -22,26 +23,23 @@ export const registerUserController = async (req, res, next) => {
   }
 };
 
-export const loginUserController = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await loginUserServices({
-      email,
-      password,
-    });
+export const loginUserController = async (req, res) => {
+  const session = await loginUserServices(req.body);
 
-    res.status(200).json({
-      status: 200,
-      message: "Successfully logged in an user!",
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        accessToken,
-        refreshToken,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
+  res.cookie("refreshToken", session.refreshToken, {
+    httpOnly: true,
+    expires: new Date(Date.now() + ONE_DAY),
+  });
+  res.cookie("sessionId", session._id, {
+    httpOnly: true,
+    expires: new Date(Date.now() + ONE_DAY),
+  });
+
+  res.json({
+    status: 200,
+    message: "Successfully logged in an user!",
+    data: {
+      accessToken: session.accessToken,
+    },
+  });
 };
