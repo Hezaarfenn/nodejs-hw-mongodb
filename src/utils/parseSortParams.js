@@ -1,4 +1,4 @@
-import SORT_ORDER from "../constants/indexConstants.js";
+import { SORT_ORDER } from "../constants/indexConstants.js";
 
 const parseSortOrder = (sortOrder) => {
   const isKnowOrder = [SORT_ORDER.ASC, SORT_ORDER.DESC].includes(sortOrder);

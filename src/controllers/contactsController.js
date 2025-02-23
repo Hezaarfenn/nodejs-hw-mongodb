@@ -1,4 +1,3 @@
-import createErrors from "http-errors";
 import contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
@@ -44,7 +43,7 @@ const getAllContacts = async (req, res) => {
 const getContactById = async (req, res) => {
   const contact = await contactsService.getContactById(req.params.id);
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(200).json({
     status: 200,
@@ -65,7 +64,7 @@ const createContact = async (req, res) => {
 const updateContact = async (req, res) => {
   const contact = await contactsService.updateContact(req.params.id, req.body);
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(200).json({
     status: 200,
@@ -77,7 +76,7 @@ const updateContact = async (req, res) => {
 const deleteContact = async (req, res) => {
   const contact = await contactsService.deleteContact(req.params.id);
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(204).send();
 };

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import pino from "pino";
 import pinoHttp from "pino-http";
+import cookieParser from "cookie-parser";
 import contactsRouter from "./routers/contactsRouter.js";
 import authRouter from "./routers/authRouter.js";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -10,8 +11,9 @@ import notFoundHandler from "./middlewares/notFoundHandler.js";
 const setupServer = () => {
   const app = express();
 
-  app.use(cors());
   app.use(express.json());
+  app.use(cors());
+  app.use(cookieParser());
 
   const logger = pino();
   app.use(pinoHttp({ logger }));

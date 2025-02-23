@@ -1,6 +1,6 @@
 import Contact from "../db/models/Contact.js";
-import createErrors from "http-errors";
-import SORT_ORDER from "../constants/indexConstants.js";
+import createHttpError from "http-errors";
+import { SORT_ORDER } from "../constants/indexConstants.js";
 import calculatePaginationData from "../utils/calculatePaginationData.js";
 
 const getAllContacts = async ({
@@ -42,7 +42,7 @@ const getAllContacts = async ({
 const getContactById = async (contactId) => {
   const contact = await Contact.findById(contactId);
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   return contact;
 };
