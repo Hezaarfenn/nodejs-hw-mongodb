@@ -27,21 +27,10 @@ const getAllContacts = async (req, res) => {
       sortOrder,
     });
 
-    const totalItems = await contactsService.getAllContacts(filterOptions);
-    const totalPages = Math.ceil(totalItems / perPage);
-
     res.status(200).json({
       status: 200,
       message: "Successfully found contacts!",
-      data: {
-        data: contacts,
-        page: Number(page),
-        perPage: Number(perPage),
-        totalItems,
-        totalPages,
-        hasPreviousPage: page !== 1,
-        hasNextPage: page < totalPages,
-      },
+      data: contacts,
     });
   } catch (error) {
     res.status(500).json({

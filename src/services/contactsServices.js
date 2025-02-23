@@ -1,6 +1,6 @@
 import Contact from "../db/models/Contact.js";
 import createErrors from "http-errors";
-import SORT_ORDER from "../constants/index.js";
+import SORT_ORDER from "../constants/indexConstants.js";
 import calculatePaginationData from "../utils/calculatePaginationData.js";
 
 const getAllContacts = async ({
