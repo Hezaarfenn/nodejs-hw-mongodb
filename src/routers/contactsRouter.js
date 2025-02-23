@@ -3,18 +3,21 @@ import contactsController from "../controllers/contactsController.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import validateBody from "../middlewares/validateBody.js";
 import isValidId from "../middlewares/isValidId.js";
+import authenticate from "../middlewares/authenticate.js";
 import {
-  contactSchema,
+  createContactSchema,
   updateContactSchema,
 } from "../validation/contactSchema.js";
 
 const router = express.Router();
 
+router.use(authenticate);
+
 router.get("/", ctrlWrapper(contactsController.getAllContacts));
 router.get("/:id", isValidId, ctrlWrapper(contactsController.getContactById));
 router.post(
   "/",
-  validateBody(contactSchema),
+  validateBody(createContactSchema),
   ctrlWrapper(contactsController.createContact),
 );
 router.patch(

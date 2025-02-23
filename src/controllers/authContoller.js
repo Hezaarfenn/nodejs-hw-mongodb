@@ -1,4 +1,4 @@
-import { ONE_DAY } from "../constants/indexConstants.js";
+import { THIRTY_DAY } from "../constants/indexConstants.js";
 import {
   registerUserServices,
   loginUserServices,
@@ -9,11 +9,11 @@ import { refreshUsersSessionServices } from "../services/authServices.js";
 const setupCookie = (res, session) => {
   res.cookie("refreshToken", session.refreshToken, {
     httpOnly: true,
-    expires: new Date(Date.now() + ONE_DAY),
+    expires: new Date(Date.now() + THIRTY_DAY),
   });
   res.cookie("sessionId", session._id, {
     httpOnly: true,
-    expires: new Date(Date.now() + ONE_DAY),
+    expires: new Date(Date.now() + THIRTY_DAY),
   });
 };
 

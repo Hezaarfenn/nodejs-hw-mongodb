@@ -2,8 +2,8 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";
 import createHttpError from "http-errors";
 import UserCollection from "../db/models/userModel.js";
-import { FIFTEEN_MINUTES, ONE_DAY } from "../constants/indexConstants.js";
-import { SessionsCollection } from "../db/models/sessionModel.js";
+import { FIFTEEN_MINUTES, THIRTY_DAY } from "../constants/indexConstants.js";
+import SessionsCollection from "../db/models/SessionModel.js";
 
 const createSession = () => {
   const accessToken = randomBytes(30).toString("base64");
@@ -12,7 +12,7 @@ const createSession = () => {
     accessToken,
     refreshToken,
     accessTokenValidUntil: Date.now() + FIFTEEN_MINUTES,
-    refreshTokenValidUntil: Date.now() + ONE_DAY,
+    refreshTokenValidUntil: Date.now() + THIRTY_DAY,
   };
 };
 
