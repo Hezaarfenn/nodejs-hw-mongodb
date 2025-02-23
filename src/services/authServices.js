@@ -80,3 +80,7 @@ export const refreshUsersSessionServices = async ({
     ...newSession,
   });
 };
+
+export const logoutUserServices = async ({ sessionId }) => {
+  await SessionsCollection.deleteOne({ _id: sessionId });
+};

@@ -2,6 +2,7 @@ import { ONE_DAY } from "../constants/indexConstants.js";
 import {
   registerUserServices,
   loginUserServices,
+  logoutUserServices,
 } from "../services/authServices.js";
 import { refreshUsersSessionServices } from "../services/authServices.js";
 
@@ -64,4 +65,15 @@ export const refreshUserSessionController = async (req, res) => {
       accessToken: session.accessToken,
     },
   });
+};
+
+export const logoutUserController = async (req, res) => {
+  if (req.cookies.sessionId) {
+    await logoutUserServices({ sessionId: req.cookies.sessionId });
+  }
+
+  res.clearCookie("sessionId");
+  res.clearCookie("refreshToken");
+
+  res.status(204).send();
 };
