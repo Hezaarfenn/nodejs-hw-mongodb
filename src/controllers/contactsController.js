@@ -1,4 +1,3 @@
-import createErrors from "http-errors";
 import contactsService from "../services/contactsServices.js";
 import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
@@ -11,7 +10,7 @@ const getAllContacts = async (req, res) => {
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const { type, isFavourite } = req.query;
 
-    const filterOptions = {};
+    const filterOptions = { userId: req.user._id };
     if (type) {
       filterOptions.contactType = type;
       if (isFavourite) {
@@ -42,9 +41,12 @@ const getAllContacts = async (req, res) => {
 };
 
 const getContactById = async (req, res) => {
-  const contact = await contactsService.getContactById(req.params.id);
+  const contact = await contactsService.getContactById(
+    req.params.id,
+    req.user._id,
+  );
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(200).json({
     status: 200,
@@ -54,18 +56,35 @@ const getContactById = async (req, res) => {
 };
 
 const createContact = async (req, res) => {
-  const contact = await contactsService.createContact(req.body);
-  res.status(201).json({
-    status: 201,
-    message: "Successfully created contact!",
-    data: contact,
-  });
+  try {
+    const contactData = {
+      ...req.body,
+      userId: req.user._id,
+    };
+    const contact = await contactsService.createContact(contactData);
+
+    res.status(201).json({
+      status: 201,
+      message: "Successfully created contact!",
+      data: contact,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "An error occurred while creating contact.",
+      error: error.message,
+    });
+  }
 };
 
 const updateContact = async (req, res) => {
-  const contact = await contactsService.updateContact(req.params.id, req.body);
+  const contact = await contactsService.updateContact(
+    req.params.id,
+    req.body,
+    req.user._id,
+  );
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(200).json({
     status: 200,
@@ -75,19 +94,27 @@ const updateContact = async (req, res) => {
 };
 
 const deleteContact = async (req, res) => {
-  const contact = await contactsService.deleteContact(req.params.id);
+  const contact = await contactsService.deleteContact(
+    req.params.id,
+    req.user._id,
+  );
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   res.status(204).send();
 };
 
 const upsertContact = async (req, res, next) => {
   const contact = req.params.id;
+  const userId = req.user._id;
 
-  const result = await contactsService.upsertContact(contact, req.body, {
-    upsert: true,
-  });
+  const result = await contactsService.upsertContact(
+    contact,
+    { ...req.body, userId },
+    {
+      upsert: true,
+    },
+  );
 
   if (!result) {
     next(createHttpError(404, "Contact not found"));

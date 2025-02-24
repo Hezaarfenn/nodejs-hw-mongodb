@@ -1,6 +1,6 @@
 import Contact from "../db/models/Contact.js";
-import createErrors from "http-errors";
-import SORT_ORDER from "../constants/indexConstants.js";
+import createHttpError from "http-errors";
+import { SORT_ORDER } from "../constants/indexConstants.js";
 import calculatePaginationData from "../utils/calculatePaginationData.js";
 
 const getAllContacts = async ({
@@ -10,8 +10,9 @@ const getAllContacts = async ({
   sortBy = "name",
   type,
   isFavourite,
+  userId,
 }) => {
-  const filterOptions = {};
+  const filterOptions = { userId };
   if (type) {
     filterOptions.contactType = type;
   }
@@ -39,10 +40,10 @@ const getAllContacts = async ({
   };
 };
 
-const getContactById = async (contactId) => {
-  const contact = await Contact.findById(contactId);
+const getContactById = async (contactId, userId) => {
+  const contact = await Contact.findById({ _id: contactId, userId });
   if (!contact) {
-    throw createErrors(404, "Contact not found");
+    throw createHttpError(404, "Contact not found");
   }
   return contact;
 };
@@ -51,17 +52,19 @@ const createContact = async (contact) => {
   return await Contact.create(contact);
 };
 
-const updateContact = async (contactId, contact) => {
-  return await Contact.findByIdAndUpdate(contactId, contact, { new: true });
+const updateContact = async (contactId, contact, userId) => {
+  return await Contact.findByIdAndUpdate({ _id: contactId, userId }, contact, {
+    new: true,
+  });
 };
 
-const deleteContact = async (contactId) => {
-  return await Contact.findByIdAndDelete(contactId);
+const deleteContact = async (contactId, userId) => {
+  return await Contact.findByIdAndDelete({ _id: contactId, userId });
 };
 
 const upsertContact = async (contactId, payload, options = {}) => {
   const rawResult = await Contact.findOneAndUpdate(
-    { _id: contactId },
+    { _id: contactId, userId: payload.userId },
     { $set: payload },
     {
       new: true,
