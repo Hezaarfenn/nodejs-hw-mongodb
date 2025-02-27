@@ -7,8 +7,11 @@ import contactsRouter from "./routers/contactsRouter.js";
 import authRouter from "./routers/authRouter.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFoundHandler from "./middlewares/notFoundHandler.js";
+import { initializeStorage } from "./utils/checkAndCreateDir.js";
 
-const setupServer = () => {
+const setupServer = async () => {
+  await initializeStorage();
+
   const app = express();
 
   app.use(express.json());

@@ -1,24 +1,16 @@
-import Contact from "../db/models/Contact.js";
+import Contact from "../db/models/ContactModel.js";
 import createHttpError from "http-errors";
 import { SORT_ORDER } from "../constants/indexConstants.js";
 import calculatePaginationData from "../utils/calculatePaginationData.js";
 
 const getAllContacts = async ({
+  filterOptions,
   page = 1,
   perPage = 10,
   sortOrder = SORT_ORDER.ASC,
   sortBy = "name",
-  type,
-  isFavourite,
-  userId,
 }) => {
-  const filterOptions = { userId };
-  if (type) {
-    filterOptions.contactType = type;
-  }
-  if (isFavourite) {
-    filterOptions.isFavourite = isFavourite === "true";
-  }
+  console.log("FilterOptions:", filterOptions);
 
   const limit = perPage;
   const skip = (page - 1) * perPage;
@@ -82,6 +74,14 @@ const upsertContact = async (contactId, payload, options = {}) => {
   };
 };
 
+const patchContact = async (contactId, updateData, userId) => {
+  return await Contact.findOneAndUpdate(
+    { _id: contactId },
+    { $set: updateData },
+    { new: true },
+  );
+};
+
 export default {
   getAllContacts,
   getContactById,
@@ -89,4 +89,5 @@ export default {
   updateContact,
   deleteContact,
   upsertContact,
+  patchContact,
 };
