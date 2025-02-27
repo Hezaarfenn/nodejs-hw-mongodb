@@ -3,6 +3,9 @@ import ctrlWrapper from "../utils/ctrlWrapper.js";
 import createHttpError from "http-errors";
 import parseSortParams from "../utils/parseSortParams.js";
 import parsePaginationParams from "../utils/parsePaginationParams.js";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary.js";
+import { checkAndCreateDir } from "../utils/checkAndCreateDir.js";
+import { env } from "../utils/env.js";
 
 const getAllContacts = async (req, res) => {
   try {
@@ -10,7 +13,7 @@ const getAllContacts = async (req, res) => {
     const { sortBy, sortOrder } = parseSortParams(req.query);
     const { type, isFavourite } = req.query;
 
-    const filterOptions = { userId: req.user._id };
+    const filterOptions = {};
     if (type) {
       filterOptions.contactType = type;
       if (isFavourite) {
@@ -57,10 +60,16 @@ const getContactById = async (req, res) => {
 
 const createContact = async (req, res) => {
   try {
-    const contactData = {
-      ...req.body,
-      userId: req.user._id,
-    };
+    const photo = req.file;
+    let photoUrl;
+    if (photo) {
+      if (env("ENABLE_CLOUDINARY") === "true") {
+        photoUrl = await uploadToCloudinary(photo);
+      } else {
+        photoUrl = await checkAndCreateDir(photo);
+      }
+    }
+    const contactData = { ...req.body, photoUrl, userId: req.user._id };
     const contact = await contactsService.createContact(contactData);
 
     res.status(201).json({
@@ -78,19 +87,44 @@ const createContact = async (req, res) => {
 };
 
 const updateContact = async (req, res) => {
-  const contact = await contactsService.updateContact(
-    req.params.id,
-    req.body,
-    req.user._id,
-  );
-  if (!contact) {
-    throw createHttpError(404, "Contact not found");
+  try {
+    const photo = req.file;
+    let photoUrl;
+
+    if (photo) {
+      if (env("ENABLE_CLOUDINARY") === "true") {
+        photoUrl = await uploadToCloudinary(photo);
+      } else {
+        photoUrl = await checkAndCreateDir(photo);
+      }
+    }
+
+    const updateData = { ...req.body };
+    if (photoUrl) {
+      updateData.photoUrl = photoUrl;
+    }
+
+    const contact = await contactsService.updateContact(
+      req.params.id,
+      updateData,
+      req.user._id,
+    );
+
+    if (!contact) {
+      throw createHttpError(404, "Contact not found");
+    }
+    res.status(200).json({
+      status: 200,
+      message: "Successfully patched a contact!",
+      data: contact,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "An error occurred while updating contact.",
+      error: error.message,
+    });
   }
-  res.status(200).json({
-    status: 200,
-    message: "Successfully patched a contact!",
-    data: contact,
-  });
 };
 
 const deleteContact = async (req, res) => {
@@ -133,6 +167,21 @@ const upsertContact = async (req, res, next) => {
   });
 };
 
+const patchContact = async (req, res) => {
+  const contact = await contactsService.patchContact(
+    req.params.id,
+    req.body,
+    req.user._id,
+  );
+  if (!contact) throw createHttpError(404, "Contact not found");
+
+  res.status(200).json({
+    status: 200,
+    message: "Successfully patched a contact!",
+    data: contact,
+  });
+};
+
 const contactsController = {
   getAllContacts: ctrlWrapper(getAllContacts),
   getContactById: ctrlWrapper(getContactById),
@@ -140,6 +189,7 @@ const contactsController = {
   updateContact: ctrlWrapper(updateContact),
   deleteContact: ctrlWrapper(deleteContact),
   upsertContact: ctrlWrapper(upsertContact),
+  patchContact: ctrlWrapper(patchContact),
 };
 
 export default contactsController;
