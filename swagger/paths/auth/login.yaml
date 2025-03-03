@@ -1,0 +1,73 @@
+tags:
+  - Auth
+summary: Login a user
+description: This endpoint allows a user to login.
+operationId: loginUser
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          email:
+            type: string
+            format: email
+            example: hezagolcuk@example.com
+          password:
+            type: string
+            format: password
+            example: password123
+responses:
+  "200":
+    description: User logged in successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: Successfully logged in an user!
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  example: efKBFCIlwZ/zTLeQZ8ev8cUwErKPO1y5gppPk/tj
+  "400":
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Something went wrong
+            data:
+              type: object
+              properties:
+                expose:
+                  type: boolean
+                  example: true
+                statusCode:
+                  type: integer
+                  example: 400
+                status:
+                  type: integer
+                  example: 400
+                body:
+                  type: string
+                  example: "{ \"email\": \"hezagolcuk@example.com\",\r\n    \r\n    \r\n}"
+                type:
+                  type: string
+                  example: entity.parse.failed
+  "401":
+    $ref: "../../components/responses/401.yaml"
+  "404":
+    $ref: "../../components/responses/404.yaml"

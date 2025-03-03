@@ -1,0 +1,39 @@
+tags:
+  - Auth
+summary: Get refresh token
+description: This endpoint allows a user to logout.
+operationId: refreshToken
+security:
+  - bearerAuth: []
+parameters:
+  - in: cookie
+    name: sessionId
+    required: true
+    schema:
+      type: string
+    description: The session ID stored in the cookie.
+responses:
+  '200':
+    description: Token refreshed successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              description: HTTP status code
+              example: 200
+            message:
+              type: string
+              description: Success message
+              example: 'Successfully refreshed a session!'
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  description: The new access token.
+                  example: 'SrDTj4tBhGhQHntmRNJ6vCmaQjWGhO5hbTWIconP'
+  '401':
+    $ref: '../../components/responses/401.yaml'

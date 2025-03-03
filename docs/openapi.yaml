@@ -1,0 +1,53 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: GoIT NodeJs Homework
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: >
+    Documentation for contatcs app
+tags:
+  - name: Contacts
+    description: Contact operations.
+  - name: Auth
+    description: Auth operations
+servers:
+  - url: http://localhost:3000
+  - url: https://nodejs-hw-mongodb-2pqs.onrender.com
+paths:
+  /contatcs:
+    get:
+      $ref: ../swagger/paths/contacts/get.yaml
+    post:
+      $ref: ../swagger/paths/contacts/post.yaml
+  /contatcs/{id}:
+    get:
+      $ref: ../swagger/paths/contacts/{id}/get.yaml
+    patch:
+      $ref: ../swagger/paths/contacts/{id}/patch.yaml
+    delete:
+      $ref: ../swagger/paths/contacts/{id}/delete.yaml
+  /auth/register:
+    post:
+      $ref: ../swagger/paths/auth/register.yaml
+  /auth/login:
+    post:
+      $ref: ../swagger/paths/auth/login.yaml
+  /auth/logout:
+    post:
+      $ref: ../swagger/paths/auth/logout.yaml
+  /auth/refresh:
+    post:
+      $ref: '../swagger/paths/auth/refresh.yaml'
+  /auth/send-reset-email:
+    post:
+      $ref: '../swagger/paths/auth/sendMail.yaml'
+  /auth/reset-pwd:
+    post:
+      $ref: '../swagger/paths/auth/resetPassword.yaml'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

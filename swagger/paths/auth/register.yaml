@@ -1,0 +1,105 @@
+tags:
+  - Auth
+summary: Register a new user
+description: This endpoint allows a new user to register.
+operationId: registerUser
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          name:
+            type: string
+            example: Heza Gölcük
+          email:
+            type: string
+            format: email
+            example: hezagolcuk@example.com
+          password:
+            type: string
+            format: password
+            example: password123
+responses:
+  "201":
+    description: User registered successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 201
+            message:
+              type: string
+              example: Successfully registered a user!
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  example: 67b8a93fc40dfd0da930f230
+                name:
+                  type: string
+                  example: Heza Gölcük
+                email:
+                  type: string
+                  example: heza@gmail.com
+                createdAt:
+                  type: string
+                  format: date-time
+                  example: 2025-02-21T16:26:39.521Z
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: 2025-02-21T16:26:39.521Z
+  "400":
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+              example: Something went wrong
+            data:
+              type: object
+              properties:
+                expose:
+                  type: boolean
+                  example: true
+                statusCode:
+                  type: integer
+                  example: 400
+                status:
+                  type: integer
+                  example: 400
+                body:
+                  type: string
+                  example: "{ \"name\": \"Heza Gölcük\",\r\n    \r\n    \r\n}"
+                type:
+                  type: string
+                  example: entity.parse.failed
+  "409":
+    description: Conflict error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 409
+            message:
+              type: string
+              example: ConflictError
+            data:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: Email in use

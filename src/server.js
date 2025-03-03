@@ -8,11 +8,14 @@ import authRouter from "./routers/authRouter.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import notFoundHandler from "./middlewares/notFoundHandler.js";
 import { initializeStorage } from "./utils/checkAndCreateDir.js";
+import setupSwagger from "../swagger/swagger.js";
 
 const setupServer = async () => {
   await initializeStorage();
 
   const app = express();
+
+  setupSwagger(app);
 
   app.use(express.json());
   app.use(cors());
