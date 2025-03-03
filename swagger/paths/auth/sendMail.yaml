@@ -1,0 +1,80 @@
+tags:
+  - Auth
+summary: Send reset password email
+description: This endpoint allows sending email for reset password.
+operationId: sendMail
+security: []
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          email:
+            type: string
+            description: The email address to send the email to.
+            example: "h.golcuk91@outlook.com"
+responses:
+  "200":
+    description: Email sent successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 200
+            message:
+              type: string
+              example: "Reset password email has been successfully sent."
+            data:
+              type: object
+              example: {}
+  "400":
+    description: Bad request
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: integer
+              example: 400
+            message:
+              type: string
+              example: "BadRequestError"
+            data:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: "Bad Request"
+                errors:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: '"email" is required'
+                      path:
+                        type: array
+                        items:
+                          type: string
+                        example: ["email"]
+                      type:
+                        type: string
+                        example: "any.required"
+                      context:
+                        type: object
+                        properties:
+                          label:
+                            type: string
+                            example: "email"
+                          key:
+                            type: string
+                            example: "email"
+  "404":
+    $ref: ../../components/responses/404.yaml

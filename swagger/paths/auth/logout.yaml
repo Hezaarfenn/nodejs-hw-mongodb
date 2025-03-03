@@ -1,0 +1,19 @@
+tags:
+  - Auth
+summary: Logout a user
+description: This endpoint allows a user to logout.
+operationId: logoutUser
+security:
+  - bearerAuth: []
+parameters:
+  - in: cookie
+    name: sessionId
+    schema:
+      type: string
+    required: true
+    description: The session ID stored in the cookie
+responses:
+  '204':
+    $ref: '../../components/responses/204.yaml'
+  '401':
+    $ref: '../../components/responses/401.yaml'
